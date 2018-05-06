@@ -1,0 +1,16 @@
+
+build/classes/.netbeans_automatic_build
+*.class
+build/classes/.netbeans_update_resources
+lib/.DS_Store
+lib/lwjgl-2.9.2/.DS_Store
+*.properties
+*.properties
+*.xml
+nbproject/private/private.properties
+nbproject/project.properties
+*.properties
+nbproject/private/private.properties
+nbproject/project.properties
+nbproject/private/private.properties
+nbproject/project.properties
