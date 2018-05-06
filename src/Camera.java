@@ -42,8 +42,8 @@ class Camera
         this.pitch -= amount;
     }
 
-    //  Method :
-    // Purpose :
+    //  Method :moveInDirectionWithDistance
+    // Purpose :Control movement of the camera
     private void moveInDirectionWithDistance ( MovementDirection direction, float distance )
     {
         System.out.println ( "Direction : " + direction + " and Distance : " + distance + " and Position : " + position );
