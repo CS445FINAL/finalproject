@@ -1,9 +1,9 @@
 /**
- * File :
- * Author :
- * Class :
- * Assignment :
- * Purpose :
+ * File : MainProgram.java
+ * Author : Michael Ly, Jose Garcia, Erik Huerta, Phong Trinh, Josh Montgomery
+ * Class : CS 445 Computer Graphics
+ * Assignment : Final Assignment Checkpoint #2
+ * Purpose : A class that creates the Display, and begins the OpenGL program
  */
 
 import org.lwjgl.opengl.Display;
@@ -18,15 +18,16 @@ class MainProgram
     private static final int WIDTH = 640;
 
     // Method  : main
-    // Purpose : Begins the program
+    // Purpose : Begins the OpenGL program
     public static void main ( String[] args )
     {
         new MainProgram ().start ();
     }
 
     //  Method : start
-    // Purpose : (Optionally) Links / Binds to the dll in the natives folder in the lib folder, calls createWindow,
-    // initGL, and finally render.
+    // Purpose : (Optionally) Links / Binds to the dll in the natives folder 
+    // in the lib folder, calls createWindow, initGL, and finally starts the 
+    // Camera loop which will process movements and rendering.
     private void start ()
     {
         try
@@ -44,19 +45,20 @@ class MainProgram
     }
 
     //  Method : createWindow
-    // Purpose : Creates a display window using our constant sizes, disables fullscreen, centers the Display and
-    // adds a title to our
+    // Purpose : Creates a display window using our constant sizes, disables 
+    // fullscreen, centers the Display and adds a title to our
     private void createWindow () throws Exception
     {
         Display.setFullscreen ( false );
         Display.setDisplayMode ( new DisplayMode ( WIDTH, HEIGHT ) );
         Display.setLocation ( -1, -1 );
-        Display.setTitle ( "Final Assignment by {Our Team Names}" );
+        Display.setTitle ( "Final Assignment by {Our Team Name}" );
         Display.create ();
     }
 
     //  Method : initGL
-    // Purpose : sets the background color, camera, id matrix, and model view
+    // Purpose : Sets the background color, matrix mode, perspective, and other
+    // important OpenGL features
     private void initGL ()
     {
         glClearColor ( 0.5f, 0.8f, .97f, 0f );
@@ -65,7 +67,8 @@ class MainProgram
         gluPerspective ( 100.0f, WIDTH / HEIGHT, 0.1f, 300.0f );
         glMatrixMode ( GL_MODELVIEW );
         glHint ( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
-        // Enable depth test
+        
+        // Enables Depth Test
         glEnable ( GL_DEPTH_TEST );
     }
 }

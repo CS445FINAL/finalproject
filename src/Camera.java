@@ -1,9 +1,11 @@
 /**
- * File :
- * Author :
- * Class :
- * Assignment :
- * Purpose :
+ * File : Camera.java
+ * Author : Michael Ly, Jose Garcia, Erik Huerta, Phong Trinh, Josh Montgomery
+ * Class : CS 445 Computer Graphics
+ * Assignment : Final Assignment Checkpoint #1
+ * Purpose : A class responsible for managing the camera movements and rendering
+ * the content. As a user presses buttons on the keyboard, the camera will
+ * update itself to reflect these changes
  */
 
 import org.lwjgl.input.Keyboard;
@@ -20,7 +22,8 @@ class Camera
     private float pitch;
 
     //  Method : Camera
-    // Purpose : Camera constructor.
+    // Purpose : Camera constructor. Creates our position Vectors and
+    // initializes the yaw and pitch to zero
     Camera ( float xCoord, float yCoord, float zCoord )
     {
         this.position = new Vector3f ( xCoord, yCoord, zCoord );
@@ -29,21 +32,23 @@ class Camera
     }
 
     //  Method : yaw
-    // Purpose : Camera rotation about the Y-Axis
+    // Purpose : Updates the Yaw, or the camera rotation about the Y-Axis
     private void yaw ( float amount )
     {
         this.yaw += amount;
     }
 
     //  Method : pitch
-    // Purpose : Camera rotation about the X-Axis
+    // Purpose : Updates the pitch, or the camera rotation about the X-Axis
     private void pitch ( float amount )
     {
         this.pitch -= amount;
     }
 
-    //  Method :moveInDirectionWithDistance
-    // Purpose :Control movement of the camera
+    //  Method : moveInDirectionWithDistance
+    // Purpose : Moves the camera in the direction and distance as requested by 
+    // the parameter. The position is also updated depending on the direction
+    // requested. 
     private void moveInDirectionWithDistance ( MovementDirection direction, float distance )
     {
         System.out.println ( "Direction : " + direction + " and Distance : " + distance + " and Position : " + position );
@@ -53,13 +58,11 @@ class Camera
             case UP:
             {
                 this.position.y -= distance;
-
                 break;
             }
             case DOWN:
             {
                 this.position.y += distance;
-
                 break;
             }
             case NORTH:
@@ -68,7 +71,6 @@ class Camera
                 float zOffset = distance * ( float ) Math.cos ( Math.toRadians ( yaw ) );
                 this.position.x -= xOffset;
                 this.position.z += zOffset;
-
                 break;
             }
             case EAST:
@@ -77,7 +79,6 @@ class Camera
                 float zOffset = distance * ( float ) Math.cos ( Math.toRadians ( yaw - 90 ) );
                 this.position.x -= xOffset;
                 this.position.z += zOffset;
-
                 break;
             }
             case SOUTH:
@@ -86,7 +87,6 @@ class Camera
                 float zOffset = distance * ( float ) Math.cos ( Math.toRadians ( yaw ) );
                 this.position.x += xOffset;
                 this.position.z -= zOffset;
-
                 break;
             }
             case WEST:
@@ -95,15 +95,14 @@ class Camera
                 float zOffset = distance * ( float ) Math.cos ( Math.toRadians ( yaw + 90 ) );
                 this.position.x -= xOffset;
                 this.position.z += zOffset;
-
                 break;
             }
         }
     }
 
     //  Method : lookThrough
-    // Purpose : Translates and rotates the matrix so that it looks through the camera. Also positions the light
-    // source relative to the position of the camera.
+    // Purpose : Translates and rotates the matrix so that it looks through the 
+    // camera.
     private void lookThrough ()
     {
         //Rotates the pitch around the X axis
@@ -115,8 +114,9 @@ class Camera
     }
 
     //  Method : updateCameraForInput
-    // Purpose : Manages all camera movements. Also, sets and maintains the distance of the movement, movement speed,
-    // and mouse sensitivity. The mouse is locked in the window and the cursor is removed.
+    // Purpose : Manages all camera movements. Also, sets and maintains the 
+    // distance of the movement, movement speed, and mouse sensitivity. 
+    // The mouse is locked in the window and the cursor is removed.
     void cameraLoop ()
     {
         float dx, dy;

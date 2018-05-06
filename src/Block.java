@@ -1,10 +1,9 @@
-
 /**
- * File :
- * Author :
- * Class :
- * Assignment :
- * Purpose :
+ * File : Block.java
+ * Author : Michael Ly, Jose Garcia, Erik Huerta, Phong Trinh, Josh Montgomery
+ * Class : CS 445 Computer Graphics
+ * Assignment : Final Assignment Checkpoint #1
+ * Purpose : A class that renders a 3D Block at the origin
  */
 
 import static org.lwjgl.opengl.GL11.*;
@@ -12,12 +11,12 @@ import static org.lwjgl.opengl.GL11.*;
 class Block {
 
     //  Method : Block
-    // Purpose :
-    Block() {
-    }
+    // Purpose : No actual purpose
+    Block() { }
 
     //  Method : renderSampleBlock
-    // Purpose :
+    // Purpose : Renders a 3D Block with a different color for each face at the
+    // origin of our coordinate system
     void renderSampleBlock() {
         glBegin(GL_QUADS);
 
