@@ -165,8 +165,10 @@ class Camera
                 this.moveInDirectionWithDistance ( MovementDirection.DOWN, movementSpeed );
             }
 
+            //look through the camera before drawing anything
             glLoadIdentity ();
             this.lookThrough ();
+            
             glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
             new Block ().renderSampleBlock ();

@@ -82,6 +82,7 @@ class Block {
 
         glEnd();
 
+        //Block outline in the same order
         glBegin(GL_LINE_LOOP);
 
         glColor3f(0.0f, 0.0f, 0.0f);
