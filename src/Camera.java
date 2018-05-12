@@ -1,4 +1,4 @@
-/**
+/*
  * File : Camera.java
  * Author : Michael Ly, Jose Garcia, Erik Huerta, Phong Trinh, Josh Montgomery
  * Class : CS 445 Computer Graphics
@@ -17,84 +17,85 @@ import static org.lwjgl.opengl.GL11.*;
 
 class Camera
 {
-    private final Vector3f position;
-    private float yaw;
-    private float pitch;
+    private final Vector3f _position;
+    private float _yaw;
+    private float _pitch;
+    private Chunk _chunk;
 
     //  Method : Camera
-    // Purpose : Camera constructor. Creates our position Vectors and
-    // initializes the yaw and pitch to zero
-    Camera ( float xCoord, float yCoord, float zCoord )
+    // Purpose : Camera constructor. Creates our _position Vectors and
+    // initializes the _yaw and _pitch to zero
+    Camera ( float xCoordinate, float yCoordinate, float zCoordinate )
     {
-        this.position = new Vector3f ( xCoord, yCoord, zCoord );
-        this.yaw = 0.0f;
-        this.pitch = 0.0f;
+        this._position = new Vector3f ( xCoordinate, yCoordinate, zCoordinate );
+        this._yaw = 0.0f;
+        this._pitch = 0.0f;
     }
 
-    //  Method : yaw
+    //  Method : _yaw
     // Purpose : Updates the Yaw, or the camera rotation about the Y-Axis
     private void yaw ( float amount )
     {
-        this.yaw += amount;
+        this._yaw += amount;
     }
 
-    //  Method : pitch
-    // Purpose : Updates the pitch, or the camera rotation about the X-Axis
+    //  Method : _pitch
+    // Purpose : Updates the _pitch, or the camera rotation about the X-Axis
     private void pitch ( float amount )
     {
-        this.pitch -= amount;
+        this._pitch -= amount;
     }
 
     //  Method : moveInDirectionWithDistance
     // Purpose : Moves the camera in the direction and distance as requested by 
-    // the parameter. The position is also updated depending on the direction
+    // the parameter. The _position is also updated depending on the direction
     // requested. 
     private void moveInDirectionWithDistance ( MovementDirection direction, float distance )
     {
-        System.out.println ( "Direction : " + direction + " and Distance : " + distance + " and Position : " + position );
+        System.out.println ( "Direction : " + direction + " and Distance : " + distance + " and Position : " + _position );
 
         switch ( direction )
         {
             case UP:
             {
-                this.position.y -= distance;
+                this._position.y -= distance;
                 break;
             }
             case DOWN:
             {
-                this.position.y += distance;
+                this._position.y += distance;
                 break;
             }
             case NORTH:
             {
-                float xOffset = distance * ( float ) Math.sin ( Math.toRadians ( yaw ) );
-                float zOffset = distance * ( float ) Math.cos ( Math.toRadians ( yaw ) );
-                this.position.x -= xOffset;
-                this.position.z += zOffset;
+                float xOffset = distance * ( float ) Math.sin ( Math.toRadians ( _yaw ) );
+                float zOffset = distance * ( float ) Math.cos ( Math.toRadians ( _yaw ) );
+                this._position.x -= xOffset;
+                this._position.z += zOffset;
                 break;
             }
             case EAST:
             {
-                float xOffset = distance * ( float ) Math.sin ( Math.toRadians ( yaw - 90 ) );
-                float zOffset = distance * ( float ) Math.cos ( Math.toRadians ( yaw - 90 ) );
-                this.position.x -= xOffset;
-                this.position.z += zOffset;
+                float xOffset = distance * ( float ) Math.sin ( Math.toRadians ( _yaw - 90 ) );
+                float zOffset = distance * ( float ) Math.cos ( Math.toRadians ( _yaw - 90 ) );
+                this._position.x -= xOffset;
+                this._position.z += zOffset;
                 break;
             }
             case SOUTH:
             {
-                float xOffset = distance * ( float ) Math.sin ( Math.toRadians ( yaw ) );
-                float zOffset = distance * ( float ) Math.cos ( Math.toRadians ( yaw ) );
-                this.position.x += xOffset;
-                this.position.z -= zOffset;
+                float xOffset = distance * ( float ) Math.sin ( Math.toRadians ( _yaw ) );
+                float zOffset = distance * ( float ) Math.cos ( Math.toRadians ( _yaw ) );
+                this._position.x += xOffset;
+                this._position.z -= zOffset;
                 break;
             }
             case WEST:
             {
-                float xOffset = distance * ( float ) Math.sin ( Math.toRadians ( yaw + 90 ) );
-                float zOffset = distance * ( float ) Math.cos ( Math.toRadians ( yaw + 90 ) );
-                this.position.x -= xOffset;
-                this.position.z += zOffset;
+                float xOffset = distance * ( float ) Math.sin ( Math.toRadians ( _yaw + 90 ) );
+                float zOffset = distance * ( float ) Math.cos ( Math.toRadians ( _yaw + 90 ) );
+                this._position.x -= xOffset;
+                this._position.z += zOffset;
                 break;
             }
         }
@@ -105,12 +106,12 @@ class Camera
     // camera.
     private void lookThrough ()
     {
-        //Rotates the pitch around the X axis
-        glRotatef ( pitch, 1.0f, 0.0f, 0.0f );
-        //Rotates the yaw around the Y axis
-        glRotatef ( yaw, 0.0f, 1.0f, 0.0f );
-        //Translates to the position vector's location
-        glTranslatef ( this.position.x, this.position.y, this.position.z );
+        //Rotates the _pitch around the X axis
+        glRotatef ( _pitch, 1.0f, 0.0f, 0.0f );
+        //Rotates the _yaw around the Y axis
+        glRotatef ( _yaw, 0.0f, 1.0f, 0.0f );
+        //Translates to the _position vector's location
+        glTranslatef ( this._position.x, this._position.y, this._position.z );
     }
 
     //  Method : updateCameraForInput
@@ -121,7 +122,7 @@ class Camera
     {
         float dx, dy;
         float mouseSensitivity = 0.15f;
-        float movementSpeed = 0.10f;
+        float movementSpeed = 0.35f;
 
         // Hide the Mouse
         Mouse.setGrabbed ( true );
@@ -165,13 +166,19 @@ class Camera
                 this.moveInDirectionWithDistance ( MovementDirection.DOWN, movementSpeed );
             }
 
-            //look through the camera before drawing anything
             glLoadIdentity ();
             this.lookThrough ();
             
             glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
             new Block ().renderSampleBlock ();
+
+            if ( _chunk == null )
+            {
+                _chunk = new Chunk ( 0, 8, -60 );
+            }
+
+            _chunk.render ();
 
             Display.update ();
             Display.sync ( 60 );

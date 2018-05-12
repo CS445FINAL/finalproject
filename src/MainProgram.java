@@ -1,4 +1,4 @@
-/**
+/*
  * File : MainProgram.java
  * Author : Michael Ly, Jose Garcia, Erik Huerta, Phong Trinh, Josh Montgomery
  * Class : CS 445 Computer Graphics
@@ -14,8 +14,8 @@ import static org.lwjgl.util.glu.GLU.gluPerspective;
 
 class MainProgram
 {
-    private static final int HEIGHT = 480;
-    private static final int WIDTH = 640;
+    private static final int _HEIGHT = 480;
+    private static final int _WIDTH = 640;
 
     // Method  : main
     // Purpose : Begins the OpenGL program
@@ -50,7 +50,7 @@ class MainProgram
     private void createWindow () throws Exception
     {
         Display.setFullscreen ( false );
-        Display.setDisplayMode ( new DisplayMode ( WIDTH, HEIGHT ) );
+        Display.setDisplayMode ( new DisplayMode ( _WIDTH, _HEIGHT ) );
         Display.setLocation ( -1, -1 );
         Display.setTitle ( "Final Assignment by {Our Team Name}" );
         Display.create ();
@@ -64,11 +64,13 @@ class MainProgram
         glClearColor ( 0.5f, 0.8f, .97f, 0f );
         glMatrixMode ( GL_PROJECTION );
         glLoadIdentity ();
-        gluPerspective ( 100.0f, WIDTH / HEIGHT, 0.1f, 300.0f );
+        gluPerspective ( 100.0f, _WIDTH / _HEIGHT, 0.1f, 300.0f );
         glMatrixMode ( GL_MODELVIEW );
         glHint ( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
-        
-        // Enables Depth Test
         glEnable ( GL_DEPTH_TEST );
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_COLOR_ARRAY);
+        glEnable(GL_TEXTURE_2D);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     }
 }
