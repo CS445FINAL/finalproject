@@ -221,7 +221,7 @@ class Chunk
                         break;
                     }
 
-                    _blocks[ x ][ y ][ z ] = new Block ( Block.BlockType.values ()[ _random.nextInt ( 5 ) ] );
+                    _blocks[ x ][ y ][ z ] = new Block ( Block.BlockType.values ()[ _random.nextInt ( 6 ) ] );
                     VertexPositionData.put ( createCube ( startX + x * _CUBE_LENGTH, y * _CUBE_LENGTH + ( int ) ( _CHUNK_SIZE * 0.8 ), startZ + z * _CUBE_LENGTH ) );
                     VertexColorData.put ( createCubeVertexColor ( getCubeColor () ) );
                     VertexTextureData.put ( Objects.requireNonNull ( createCubeTexture ( _blocks[ x ][ y ][ z ] ) ) );
