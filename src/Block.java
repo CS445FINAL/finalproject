@@ -165,13 +165,6 @@ class Block
             this.setBlockTypeID ( identifier );
         }
 
-        //  Method : randomMiddleLayerIdentifier
-        // Purpose : Creates a Middle Layer Block ID ( Dirt, Stone, or Bedrock )
-        public static BlockType randomMiddleLayerIdentifier ()
-        {
-            return values () [ 3 + ( int ) ( Math.random () * 2.0f ) ];
-        }
-
         //  Method : getBlockTypeID
         // Purpose : Returns the ID of the BlockType
         int getBlockTypeID ()
