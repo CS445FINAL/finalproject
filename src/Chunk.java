@@ -12,8 +12,11 @@ import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
@@ -185,10 +188,61 @@ class Chunk
         FloatBuffer VertexColorData = BufferUtils.createFloatBuffer ( ( _CHUNK_SIZE * _CHUNK_SIZE * _CHUNK_SIZE ) * 6 * 12 );
         FloatBuffer VertexTextureData = BufferUtils.createFloatBuffer ( ( _CHUNK_SIZE * _CHUNK_SIZE * _CHUNK_SIZE ) * 6 * 12 );
 
+        /*
+         * This small chunk of code is here so that the world generation does not follow a predictable pattern such as
+         * ( 0, 0, 0 ) followed by ( 0, 0, 1 ) but rather ( 0, 0, 0 ) to possibly ( 10, 0, 29 ) as an example.
+         * This is to ensure that Water/Sand Blocks are placed sparsely rather than locally.
+         */
+
+        ArrayList<Integer> xValues = new ArrayList<> ();
+
+        for ( Integer value : IntStream.range ( 0, _CHUNK_SIZE ).toArray () )
+        {
+            xValues.add ( value );
+        }
+
+        Collections.shuffle ( xValues );
+        ArrayList<Integer> zValues = new ArrayList<> ( xValues );
+
+        System.out.println ( "Sand Ratio : " + _SAND_RATIO );
+        System.out.println ( "Water Ratio : " + _WATER_RATIO );
+
+        for ( int x : xValues )
+        {
+            for ( int z : zValues )
+            {
+                for ( int y = 0; y < _CHUNK_SIZE; y++ )
+                {
+                    int height = ( int ) ( startY + ( int ) ( _CHUNK_SIZE * noise.getNoise ( x, y, z ) ) * _CUBE_LENGTH );
+
+                    System.out.println ( "X : " + x + " Y : " + y + " Z : " + z );
+
+                    // Randomly selects a Block Type
+                    // _blocks[x][y][z] = new Block ( Block.BlockType.values ()[_random.nextInt ( 6 )] );
+
+                    // Based on Y-Coordinate, will find the correct Block type
+                    // A Y-Coordinate <= 0 always signifies Bedrock
+                    // A Y-Coordinate above 0 and below the maximum height is Stone or Dirt
+                    // The topmost Y-Coordinate, the max, is Grass, Sand, or Water
+                    _blocks[x][y][z] = findAppropriateBlockTypeUsingCoordinate ( x, y, z, height < y );
+
+                    VertexPositionData.put ( createCube ( startX + x * _CUBE_LENGTH, y * _CUBE_LENGTH + ( int ) ( _CHUNK_SIZE * 0.8 ), startZ + z * _CUBE_LENGTH ) );
+                    VertexColorData.put ( createCubeVertexColor ( getCubeColor () ) );
+                    VertexTextureData.put ( Objects.requireNonNull ( createCubeTexture ( _blocks[x][y][z] ) ) );
+
+                    if ( height < y )
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
         /**
          * This approach places Sand/Water in predictable locations rather than random locations
          */
 
+        /*
         System.out.println ( "Sand Ratio : " + _SAND_RATIO );
         System.out.println ( "Water Ratio : " + _WATER_RATIO );
 
@@ -220,6 +274,7 @@ class Chunk
                 }
             }
         }
+        */
 
         VertexColorData.flip ();
         VertexPositionData.flip ();
