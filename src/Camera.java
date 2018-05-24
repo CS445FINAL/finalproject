@@ -8,10 +8,13 @@
  * update itself to reflect these changes
  */
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
+
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -112,6 +115,10 @@ class Camera
         glRotatef ( _yaw, 0.0f, 1.0f, 0.0f );
         //Translates to the _position vector's location
         glTranslatef ( this._position.x, this._position.y, this._position.z );
+
+        FloatBuffer lightPosition = BufferUtils.createFloatBuffer ( 4 );
+        lightPosition.put ( _position.x ).put ( _position.y ).put ( _position.z ).put ( 1.0f ).flip ();
+        glLight ( GL_LIGHT0, GL_POSITION, lightPosition );
     }
 
     //  Method : updateCameraForInput
@@ -168,7 +175,7 @@ class Camera
 
             glLoadIdentity ();
             this.lookThrough ();
-            
+
             glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
             new Block ().renderSampleBlock ();

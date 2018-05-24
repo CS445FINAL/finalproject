@@ -22,7 +22,7 @@ import static org.lwjgl.opengl.GL15.*;
  * World Partitioning Scheme
  * In reality, Earth is 71 % Water and 29 % Land
  * For our Game, 70 % Land and 30 % Between Water and Sand
- * Or, 21 Blocks of Grass and 9 Blocks of Water / Sand
+ * Or, 530 Blocks of Grass and 270 Blocks of Water / Sand
  */
 
 class Chunk
@@ -39,9 +39,9 @@ class Chunk
     private static final int _SAND_RATIO = ( int ) ( _CHUNK_SIZE * _CHUNK_SIZE * 0.10 );
 
     private static final int _WATER_RATIO = ( int ) ( _CHUNK_SIZE * _CHUNK_SIZE * 0.20 );
-    final int waterLocationX = Double.valueOf ( Math.random () * _CHUNK_SIZE ).intValue ();
-    final int waterLocationZ = Double.valueOf ( Math.random () * _CHUNK_SIZE ).intValue ();
-    final int waterRadius =  Math.round ( ( float ) Math.sqrt ( _WATER_RATIO / Math.PI ) );
+    private final int waterLocationX = Double.valueOf ( Math.random () * _CHUNK_SIZE ).intValue ();
+    private final int waterLocationZ = Double.valueOf ( Math.random () * _CHUNK_SIZE ).intValue ();
+    private final int waterRadius = Math.round ( ( float ) Math.sqrt ( _WATER_RATIO / Math.PI ) );
 
     private int _sandBlockCount, _waterBlockCount;
 
@@ -185,59 +185,6 @@ class Chunk
         FloatBuffer VertexColorData = BufferUtils.createFloatBuffer ( ( _CHUNK_SIZE * _CHUNK_SIZE * _CHUNK_SIZE ) * 6 * 12 );
         FloatBuffer VertexTextureData = BufferUtils.createFloatBuffer ( ( _CHUNK_SIZE * _CHUNK_SIZE * _CHUNK_SIZE ) * 6 * 12 );
 
-        /*
-         * This small chunk of code is here so that the world generation does not follow a predictable pattern such as
-         * ( 0, 0, 0 ) followed by ( 0, 0, 1 ) but rather ( 0, 0, 0 ) to possibly ( 10, 0, 29 ) as an example.
-         * This is to ensure that Water/Sand Blocks are placed sparsely rather than locally.
-         */
-
-        /*
-        ArrayList<Integer> xValues = new ArrayList<> (), zValues = new ArrayList<> ();
-
-        for ( Integer value : IntStream.range ( 0, _CHUNK_SIZE ).toArray () )
-        {
-            xValues.add ( value );
-            zValues.add ( value );
-        }
-
-        Collections.shuffle ( xValues );
-        Collections.shuffle ( zValues );
-
-        System.out.println ( "Sand Ratio : " + _SAND_RATIO );
-        System.out.println ( "Water Ratio : " + _WATER_RATIO );
-
-        for ( int x : xValues )
-        {
-            for ( int z : zValues )
-            {
-                for ( int y = 0; y < _CHUNK_SIZE; y++ )
-                {
-                    int height = ( int ) ( startY + ( int ) ( _CHUNK_SIZE * noise.getNoise ( x, y, z ) ) * _CUBE_LENGTH );
-
-                    System.out.println ( "X : " + x + " Y : " + y + " Z : " + z );
-
-                    // Randomly selects a Block Type
-                    // _blocks[x][y][z] = new Block ( Block.BlockType.values ()[_random.nextInt ( 6 )] );
-
-                    // Based on Y-Coordinate, will find the correct Block type
-                    // A Y-Coordinate <= 0 always signifies Bedrock
-                    // A Y-Coordinate above 0 and below the maximum height is Stone or Dirt
-                    // The topmost Y-Coordinate, the max, is Grass, Sand, or Water
-                    _blocks[x][y][z] = findAppropriateBlockTypeUsingYCoordinate ( x, y, z, height < y );
-
-                    VertexPositionData.put ( createCube ( startX + x * _CUBE_LENGTH, y * _CUBE_LENGTH + ( int ) ( _CHUNK_SIZE * 0.8 ), startZ + z * _CUBE_LENGTH ) );
-                    VertexColorData.put ( createCubeVertexColor ( getCubeColor () ) );
-                    VertexTextureData.put ( Objects.requireNonNull ( createCubeTexture ( _blocks[x][y][z] ) ) );
-
-                    if ( height < y )
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-        */
-
         /**
          * This approach places Sand/Water in predictable locations rather than random locations
          */
@@ -302,11 +249,13 @@ class Chunk
             // We are at the Topmost Layer
             if ( haveReachedHeightLimit )
             {
+                // If we are in the Area of the Lake/Pond, fill it with Water
                 if ( Math.abs ( x - waterLocationX ) <= waterRadius && Math.abs ( z - waterLocationZ ) <= waterRadius && _waterBlockCount < _WATER_RATIO )
                 {
                     ++_waterBlockCount;
                     return new Block ( Block.BlockType.Water );
                 }
+                // Else, flip a coin and either fill with Grass or Sand if we are under the Sand Ratio
                 else
                 {
                     int coinFlip = Math.round ( ( float ) Math.random () );
@@ -321,30 +270,6 @@ class Chunk
                         return new Block ( Block.BlockType.Grass );
                     }
                 }
-
-                /*
-                int sandWaterCount = _sandBlockCount + _waterBlockCount;
-
-                if ( probability <= ( 1.0 / 3.0 ) && sandWaterCount < ( _SAND_RATIO + _WATER_RATIO ) )
-                {
-                    int coinFlip = Math.round ( ( float ) Math.random () );
-
-                    if ( coinFlip <= 0 )
-                    {
-                        ++_sandBlockCount;
-                        return new Block ( Block.BlockType.Sand );
-                    }
-                    else
-                    {
-                        ++_waterBlockCount;
-                        return new Block ( Block.BlockType.Water );
-                    }
-                }
-                else
-                {
-                    return new Block ( Block.BlockType.Grass );
-                }
-                */
             }
             // We are above Bedrock but below Topmost Layer
             else

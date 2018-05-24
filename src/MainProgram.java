@@ -6,8 +6,11 @@
  * Purpose : A class that creates the Display, and begins the OpenGL program
  */
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
@@ -16,6 +19,9 @@ class MainProgram
 {
     private static final int _HEIGHT = 480;
     private static final int _WIDTH = 640;
+
+    private FloatBuffer _lightPosition;
+    private FloatBuffer _whiteLight;
 
     // Method  : main
     // Purpose : Begins the OpenGL program
@@ -36,7 +42,7 @@ class MainProgram
             // System.setProperty("org.lwjgl.librarypath", new File("lib/lwjgl-2.9.2/native/windows").getAbsolutePath());
             createWindow ();
             initGL ();
-            new Camera ( 0, 0, 0 ).cameraLoop ();
+            new Camera ( 0, 0, -5 ).cameraLoop ();
         }
         catch ( Exception exception )
         {
@@ -57,8 +63,7 @@ class MainProgram
     }
 
     //  Method : initGL
-    // Purpose : Sets the background color, matrix mode, perspective, and other
-    // important OpenGL features
+    // Purpose : Sets the background color, matrix mode, perspective, and other important OpenGL features
     private void initGL ()
     {
         glClearColor ( 0.5f, 0.8f, .97f, 0f );
@@ -68,9 +73,28 @@ class MainProgram
         glMatrixMode ( GL_MODELVIEW );
         glHint ( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
         glEnable ( GL_DEPTH_TEST );
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_COLOR_ARRAY);
-        glEnable(GL_TEXTURE_2D);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glEnableClientState ( GL_VERTEX_ARRAY );
+        glEnableClientState ( GL_COLOR_ARRAY );
+        glEnable ( GL_TEXTURE_2D );
+        glEnableClientState ( GL_TEXTURE_COORD_ARRAY );
+
+        initLightArrays ();
+        glLight ( GL_LIGHT0, GL_POSITION, _lightPosition );
+        glLight ( GL_LIGHT0, GL_SPECULAR, _whiteLight );
+        glLight ( GL_LIGHT0, GL_DIFFUSE, _whiteLight );
+        glLight ( GL_LIGHT0, GL_AMBIENT, _whiteLight );
+        glEnable ( GL_LIGHTING );
+        glEnable ( GL_LIGHT0 );
+    }
+
+    //  Method : initLightArrays
+    // Purpose : Initializes white light and source
+    private void initLightArrays ()
+    {
+        _lightPosition = BufferUtils.createFloatBuffer ( 4 );
+        _lightPosition.put ( 0.0f ).put ( 0.0f ).put ( 0.0f ).put ( 1.0f ).flip ();
+
+        _whiteLight = BufferUtils.createFloatBuffer ( 4 );
+        _whiteLight.put ( 1.0f ).put ( 1.0f ).put ( 1.0f ).put ( 0.0f ).flip ();
     }
 }
