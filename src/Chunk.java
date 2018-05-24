@@ -207,7 +207,7 @@ class Chunk
                     // A Y-Coordinate <= 0 always signifies Bedrock
                     // A Y-Coordinate above 0 and below the maximum height is Stone or Dirt
                     // The topmost Y-Coordinate, the max, is Grass, Sand, or Water
-                    _blocks[x][y][z] = findAppropriateBlockTypeUsingYCoordinate ( x, y, z, height < y );
+                    _blocks[x][y][z] = findAppropriateBlockTypeUsingCoordinate ( x, y, z, height < y );
 
                     VertexPositionData.put ( createCube ( startX + x * _CUBE_LENGTH, y * _CUBE_LENGTH + ( int ) ( _CHUNK_SIZE * 0.8 ), startZ + z * _CUBE_LENGTH ) );
                     VertexColorData.put ( createCubeVertexColor ( getCubeColor () ) );
@@ -237,7 +237,7 @@ class Chunk
 
     //  Method : findBlockTypeUsingCoordinate
     // Purpose :
-    private Block findAppropriateBlockTypeUsingYCoordinate ( int x, int y, int z, boolean haveReachedHeightLimit )
+    private Block findAppropriateBlockTypeUsingCoordinate ( int x, int y, int z, boolean haveReachedHeightLimit )
     {
         // Bedrock
         if ( y <= 0 )
