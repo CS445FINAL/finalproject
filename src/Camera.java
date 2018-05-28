@@ -182,6 +182,8 @@ class Camera
 
             if ( _chunk == null )
             {
+                System.out.println ( "Now Loading World" );
+
                 _chunk = new Chunk ( 0, 8, -60 );
             }
 
