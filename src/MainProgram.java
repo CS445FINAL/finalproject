@@ -2,7 +2,7 @@
  * File : MainProgram.java
  * Author : Michael Ly, Jose Garcia, Erik Huerta, Phong Trinh, Josh Montgomery
  * Class : CS 445 Computer Graphics
- * Assignment : Final Assignment Checkpoint #2
+ * Assignment : Final Assignment Checkpoint #3
  * Purpose : A class that creates the Display, and begins the OpenGL program
  */
 

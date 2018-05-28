@@ -2,7 +2,7 @@
  * File : Chunk.java
  * Author : Michael Ly, Jose Garcia, Erik Huerta, Phong Trinh, Josh Montgomery
  * Class : CS 445 Computer Graphics
- * Assignment : Final Assignment Checkpoint #2
+ * Assignment : Final Assignment Checkpoint #3
  * Purpose : A class that renders a random assortment of 3D Chunks
  */
 
@@ -297,7 +297,10 @@ class Chunk
     }
 
     //  Method : findBlockTypeUsingCoordinate
-    // Purpose :
+    // Purpose : Builds the world as layers. Bottom layer is Bedrock, followed by Dirt/Stone, and ultimately Water
+    // Sand or Grass. While at the topmost layer, based on the location of the block, if it is inside the radius
+    // of our Lake/Pond, then return a Water Block Type, but if we are outside the radius, then generate a random
+    // chance and either fill using Grass or Sand
     private Block findAppropriateBlockTypeUsingCoordinate ( int x, int y, int z, boolean haveReachedHeightLimit )
     {
         // Bedrock

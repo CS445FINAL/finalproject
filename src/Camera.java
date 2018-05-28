@@ -2,7 +2,7 @@
  * File : Camera.java
  * Author : Michael Ly, Jose Garcia, Erik Huerta, Phong Trinh, Josh Montgomery
  * Class : CS 445 Computer Graphics
- * Assignment : Final Assignment Checkpoint #1
+ * Assignment : Final Assignment Checkpoint #3
  * Purpose : A class responsible for managing the camera movements and rendering
  * the content. As a user presses buttons on the keyboard, the camera will
  * update itself to reflect these changes
