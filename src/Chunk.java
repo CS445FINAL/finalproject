@@ -41,6 +41,9 @@ class Chunk
     private final int waterLocationX = Double.valueOf ( Math.random () * _CHUNK_SIZE ).intValue ();
     private final int waterLocationZ = Double.valueOf ( Math.random () * _CHUNK_SIZE ).intValue ();
     private final int waterRadius = Math.round ( ( float ) Math.sqrt ( _WATER_RATIO / Math.PI ) );
+    
+    //initialize Texture
+    private Texture texture;
 
     private int _sandBlockCount, _waterBlockCount;
 
@@ -51,16 +54,8 @@ class Chunk
         _sandBlockCount = _waterBlockCount = 0;
 
         // Initialize the Texture
-        try
-        {
-            Texture texture = TextureLoader.getTexture ( "PNG", ResourceLoader.getResourceAsStream ( "/resources/terrain.png" ) );
-        }
-        catch ( Exception e )
-        {
-            System.err.println ( "Textures at \"/resources/terrain.png\" could not be loaded" );
-            System.exit ( -1 );
-        }
-
+        texture = loadTexture();
+       
         this._random = new Random ();
         this._blocks = new Block[_CHUNK_SIZE][_CHUNK_SIZE][_CHUNK_SIZE];
 
@@ -178,7 +173,7 @@ class Chunk
         glBindBuffer ( GL_ARRAY_BUFFER, _vboColorHandle );
         glColorPointer ( 3, GL_FLOAT, 0, 0L );
         glBindBuffer ( GL_ARRAY_BUFFER, _vboTextureHandle );
-        glBindTexture ( GL_TEXTURE_2D, 1 );
+        glBindTexture ( GL_TEXTURE_2D, texture.getTextureID() );
         glTexCoordPointer ( 2, GL_FLOAT, 0, 0L );
         glDrawArrays ( GL_QUADS, 0, _CHUNK_SIZE * _CHUNK_SIZE * _CHUNK_SIZE * 24 );
         glPopMatrix ();
@@ -365,5 +360,21 @@ class Chunk
     private float[] getCubeColor ()
     {
         return new float[] { 1, 1, 1 };
+    }
+    
+    //Method: loadTexture
+    //Purpose: return texture to the variable for using more properly
+    private Texture loadTexture()
+    {
+        try
+        {
+            return TextureLoader.getTexture ( "PNG", ResourceLoader.getResourceAsStream ( "/resources/terrain.png" ) );
+        }
+        catch ( Exception e )
+        {
+            System.err.println ( "Textures at \"/resources/terrain.png\" could not be loaded" );
+            System.exit ( -1 );
+        }
+        return null;
     }
 }
