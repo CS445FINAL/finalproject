@@ -206,8 +206,11 @@ class Chunk
         Collections.shuffle ( xValues );
         ArrayList< Integer > zValues = new ArrayList<> ( xValues );
 
-        System.out.println ( "Sand Ratio : " + _SAND_RATIO );
-        System.out.println ( "Water Ratio : " + _WATER_RATIO );
+        if ( Debug.isDebugging () )
+        {
+            System.out.println ( "Sand Ratio : " + _SAND_RATIO );
+            System.out.println ( "Water Ratio : " + _WATER_RATIO );
+        }
 
         for ( int x : xValues )
         {
@@ -217,7 +220,10 @@ class Chunk
                 {
                     int height = ( int ) ( startY + ( int ) ( _CHUNK_SIZE * noise.getNoise ( x, y, z ) ) * _CUBE_LENGTH );
 
-                    System.out.println ( "X : " + x + " Y : " + y + " Z : " + z );
+                    if ( Debug.isDebugging () )
+                    {
+                        System.out.println ( "X : " + x + " Y : " + y + " Z : " + z );
+                    }
 
                     // Randomly selects a Block Type
                     // _blocks[x][y][z] = new Block ( Block.BlockType.values ()[_random.nextInt ( 6 )] );

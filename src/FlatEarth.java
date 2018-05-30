@@ -97,12 +97,20 @@ class FlatEarth
                     if ( index <= 0 )
                     {
                         key = Integer.parseInt ( components[index] );
-                        System.out.println ( "Key : " + key );
+
+                        if ( Debug.isDebugging () )
+                        {
+                            System.out.println ( "Key : " + key );
+                        }
                     }
                     else
                     {
                         String[] dashComponents = components[index].split ( dashRegEx );
-                        System.out.println ( "Dash Components : " + Arrays.toString ( dashComponents ) );
+
+                        if ( Debug.isDebugging () )
+                        {
+                            System.out.println ( "Dash Components : " + Arrays.toString ( dashComponents ) );
+                        }
 
                         if ( dashComponents.length >= 2 )
                         {
@@ -124,37 +132,61 @@ class FlatEarth
                 {
                     case NorthAmerica:
                     {
-                        System.out.println ( "North America : Key : " + key + " Values : " + values.toString () );
+                        if ( Debug.isDebugging () )
+                        {
+                            System.out.println ( "North America : Key : " + key + " Values : " + values.toString () );
+                        }
+
                         northAmerica.put ( key, values );
                         break;
                     }
                     case SouthAmerica:
                     {
-                        System.out.println ( "South America : Key : " + key + " Values : " + values.toString () );
+                        if ( Debug.isDebugging () )
+                        {
+                            System.out.println ( "South America : Key : " + key + " Values : " + values.toString () );
+                        }
+
                         southAmerica.put ( key, values );
                         break;
                     }
                     case Europe:
                     {
-                        System.out.println ( "Europe : Key : " + key + " Values : " + values.toString () );
+                        if ( Debug.isDebugging () )
+                        {
+                            System.out.println ( "Europe : Key : " + key + " Values : " + values.toString () );
+                        }
+
                         europe.put ( key, values );
                         break;
                     }
                     case Africa:
                     {
-                        System.out.println ( "Africa : Key : " + key + " Values : " + values.toString () );
+                        if ( Debug.isDebugging () )
+                        {
+                            System.out.println ( "Africa : Key : " + key + " Values : " + values.toString () );
+                        }
+
                         africa.put ( key, values );
                         break;
                     }
                     case Asia:
                     {
-                        System.out.println ( "Asia : Key : " + key + " Values : " + values.toString () );
+                        if ( Debug.isDebugging () )
+                        {
+                            System.out.println ( "Asia : Key : " + key + " Values : " + values.toString () );
+                        }
+
                         asia.put ( key, values );
                         break;
                     }
                     case Australia:
                     {
-                        System.out.println ( "Australia : Key : " + key + " Values : " + values.toString () );
+                        if ( Debug.isDebugging () )
+                        {
+                            System.out.println ( "Australia : Key : " + key + " Values : " + values.toString () );
+                        }
+
                         australia.put ( key, values );
                         break;
                     }
@@ -302,8 +334,11 @@ class FlatEarth
 
                     final int currentRadius = Math.round ( ( float ) ( Math.sqrt ( currentX * currentX + currentZ * currentZ ) ) );
 
-                    System.out.println ( "X : " + x + " Y : " + y + " Z : " + z );
-                    System.out.println ( "Current Radius : " + currentRadius + " vs. Radius : " + radius );
+                    if ( Debug.isDebugging () )
+                    {
+                        System.out.println ( "X : " + x + " Y : " + y + " Z : " + z );
+                        System.out.println ( "Current Radius : " + currentRadius + " vs. Radius : " + radius );
+                    }
 
                     if ( currentRadius <= radius )
                     {

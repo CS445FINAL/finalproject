@@ -58,7 +58,10 @@ class Camera
     // requested. 
     private void moveInDirectionWithDistance ( MovementDirection direction, float distance )
     {
-        System.out.println ( "Direction : " + direction + " and Distance : " + distance + " and Position : " + _position );
+        if ( Debug.isDebugging () )
+        {
+            System.out.println ( "Direction : " + direction + " and Distance : " + distance + " and Position : " + _position );
+        }
 
         switch ( direction )
         {
@@ -149,7 +152,10 @@ class Camera
 
             if ( Keyboard.isKeyDown ( Keyboard.KEY_ESCAPE ) )
             {
-                System.out.println ( "Goodbye!" );
+                if ( Debug.isDebugging () )
+                {
+                    System.out.println ( "Goodbye!" );
+                }
             }
             else if ( Keyboard.isKeyDown ( Keyboard.KEY_UP ) || Keyboard.isKeyDown ( Keyboard.KEY_W ) )
             {
@@ -191,7 +197,11 @@ class Camera
 
                 if ( _flatEarth == null )
                 {
-                    System.out.println ( "Now Loading Flat Earth" );
+                    if ( Debug.isDebugging () )
+                    {
+                        System.out.println ( "Now Loading Flat Earth" );
+                    }
+
                     _flatEarth = new FlatEarth ( 0, 8, -60 );
                 }
 
@@ -205,7 +215,11 @@ class Camera
 
                 if ( _chunk == null )
                 {
-                    System.out.println ( "Now Loading World" );
+                    if ( Debug.isDebugging () )
+                    {
+                        System.out.println ( "Now Loading World" );
+                    }
+
                     _chunk = new Chunk ( 0, 8, -60 );
                 }
 
