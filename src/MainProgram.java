@@ -66,7 +66,7 @@ class MainProgram
     // Purpose : Sets the background color, matrix mode, perspective, and other important OpenGL features
     private void initGL ()
     {
-        glClearColor ( 0.0f, 0.5f, 1.0f, 0f );
+//        glClearColor ( 0.0f, 0.5f, 1.0f, 0f );
 
         glMatrixMode ( GL_PROJECTION );
         glLoadIdentity ();

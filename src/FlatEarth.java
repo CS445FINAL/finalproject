@@ -11,52 +11,61 @@ import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
+import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Random;
-import java.util.stream.IntStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 
-/**
- * World Partitioning Scheme In reality, Earth is 71 % Water and 29 % Land For
- * our Game, 70 % Land and 30 % Between Water and Sand Or, 530 Blocks of Grass
- * and 270 Blocks of Water / Sand
+/*
+ * Volume = ( PI * R * R * H ) / 3
  */
-class Chunk
-{
 
+class FlatEarth
+{
     private static final int _CHUNK_SIZE = 30;
     private static final int _CUBE_LENGTH = 2;
-    private static final int _SAND_RATIO = ( int ) ( _CHUNK_SIZE * _CHUNK_SIZE * 0.10 );
-    private static final int _WATER_RATIO = ( int ) ( _CHUNK_SIZE * _CHUNK_SIZE * 0.20 );
     private final Block[][][] _blocks;
     private final int _vboVertexHandle;
     private final int _vboColorHandle;
     private final int _vboTextureHandle;
-    private final Random _random;
-    private final int waterLocationX = Double.valueOf ( Math.random () * _CHUNK_SIZE ).intValue ();
-    private final int waterLocationZ = Double.valueOf ( Math.random () * _CHUNK_SIZE ).intValue ();
-    private final int waterRadius = Math.round ( ( float ) Math.sqrt ( _WATER_RATIO / Math.PI ) );
+
+    /* Flat Earth Variables */
+    private int _CENTERX = _CHUNK_SIZE / 2;
+    private int _CENTERZ = _CHUNK_SIZE / 2;
+
+    private static String commaRegEx = ",\\p{Space}*";
+    private static String dashRegEx = "\\p{Space}*-\\p{Space}*";
+
+    // X , Z
+    private HashMap< Integer, ArrayList< Integer > > northAmerica = new HashMap<> ();
+    private HashMap< Integer, ArrayList< Integer > > southAmerica = new HashMap<> ();
+    private HashMap< Integer, ArrayList< Integer > > europe = new HashMap<> ();
+    private HashMap< Integer, ArrayList< Integer > > africa = new HashMap<> ();
+    private HashMap< Integer, ArrayList< Integer > > asia = new HashMap<> ();
+    private HashMap< Integer, ArrayList< Integer > > australia = new HashMap<> ();
 
     //initialize Texture
     private Texture texture;
 
-    private int _sandBlockCount, _waterBlockCount;
-
     //  Method : Chunk
     // Purpose : Initializes the Texture object, Blocks 3D array, and Handles that will be used for creating Chunks
-    Chunk ( int originX, int originY, int originZ )
+    FlatEarth ( int originX, int originY, int originZ )
     {
-        _sandBlockCount = _waterBlockCount = 0;
+        // Load Continent Data
+        populateContinentResourcesFor ( Continent.NorthAmerica );
+        populateContinentResourcesFor ( Continent.SouthAmerica );
+        populateContinentResourcesFor ( Continent.Europe );
+        populateContinentResourcesFor ( Continent.Asia );
+        populateContinentResourcesFor ( Continent.Africa );
+        populateContinentResourcesFor ( Continent.Australia );
 
         // Initialize the Texture
         texture = loadTexture ();
 
-        this._random = new Random ();
         this._blocks = new Block[_CHUNK_SIZE][_CHUNK_SIZE][_CHUNK_SIZE];
 
         this._vboColorHandle = glGenBuffers ();
@@ -64,6 +73,93 @@ class Chunk
         this._vboTextureHandle = glGenBuffers ();
 
         this.rebuildMesh ( originX, originY, originZ );
+    }
+
+    private void populateContinentResourcesFor ( final Continent continent )
+    {
+        String continentString = continent.toString ();
+
+        try
+        {
+            for ( String line : Files.readAllLines ( Paths.get ( "./resources/Continents/" + continentString + ".txt" ) ) )
+            {
+                String[] components = line.split ( commaRegEx );
+                Integer key = -1;
+                ArrayList< Integer > values = new ArrayList<> ();
+
+                for ( int index = 0; index < components.length; ++index )
+                {
+                    if ( index <= 0 )
+                    {
+                        key = Integer.parseInt ( components[index] );
+                        System.out.println ( "Key : " + key );
+                    }
+                    else
+                    {
+                        String[] dashComponents = components[index].split ( dashRegEx );
+                        System.out.println ( "Dash Components : " + Arrays.toString ( dashComponents ) );
+
+                        if ( dashComponents.length >= 2 )
+                        {
+                            Integer leftBound = Integer.parseInt ( dashComponents[0] );
+                            Integer rightBound = Integer.parseInt ( dashComponents[dashComponents.length - 1] );
+                            while ( leftBound <= rightBound )
+                            {
+                                values.add ( leftBound++ );
+                            }
+                        }
+                        else
+                        {
+                            values.add ( Integer.parseInt ( dashComponents[0] ) );
+                        }
+                    }
+                }
+
+                switch ( continent )
+                {
+                    case NorthAmerica:
+                    {
+                        System.out.println ( "North America : Key : " + key + " Values : " + values.toString () );
+                        northAmerica.put ( key, values );
+                        break;
+                    }
+                    case SouthAmerica:
+                    {
+                        System.out.println ( "South America : Key : " + key + " Values : " + values.toString () );
+                        southAmerica.put ( key, values );
+                        break;
+                    }
+                    case Europe:
+                    {
+                        System.out.println ( "Europe : Key : " + key + " Values : " + values.toString () );
+                        europe.put ( key, values );
+                        break;
+                    }
+                    case Africa:
+                    {
+                        System.out.println ( "Africa : Key : " + key + " Values : " + values.toString () );
+                        africa.put ( key, values );
+                        break;
+                    }
+                    case Asia:
+                    {
+                        System.out.println ( "Asia : Key : " + key + " Values : " + values.toString () );
+                        asia.put ( key, values );
+                        break;
+                    }
+                    case Australia:
+                    {
+                        System.out.println ( "Australia : Key : " + key + " Values : " + values.toString () );
+                        australia.put ( key, values );
+                        break;
+                    }
+                }
+            }
+        }
+        catch ( IOException exception )
+        {
+            exception.printStackTrace ();
+        }
     }
 
     //  Method : createCube
@@ -183,100 +279,60 @@ class Chunk
     // Purpose : Generating the terrain using the Simplex Noise Classes. Also, draws the Chunks which create the world
     private void rebuildMesh ( float startX, float startY, float startZ )
     {
-        float persistence = 0.6f * ( _random.nextFloat () % 0.4f );
-        int seed = _random.nextInt ( 50 ) + 1;
-
-        SimplexNoise noise = new SimplexNoise ( _CHUNK_SIZE, persistence, seed );
         FloatBuffer VertexPositionData = BufferUtils.createFloatBuffer ( ( _CHUNK_SIZE * _CHUNK_SIZE * _CHUNK_SIZE ) * 6 * 12 );
         FloatBuffer VertexColorData = BufferUtils.createFloatBuffer ( ( _CHUNK_SIZE * _CHUNK_SIZE * _CHUNK_SIZE ) * 6 * 12 );
         FloatBuffer VertexTextureData = BufferUtils.createFloatBuffer ( ( _CHUNK_SIZE * _CHUNK_SIZE * _CHUNK_SIZE ) * 6 * 12 );
-
-        /*
-         * This small chunk of code is here so that the world generation does not follow a predictable pattern such as
-         * ( 0, 0, 0 ) followed by ( 0, 0, 1 ) but rather ( 0, 0, 0 ) to possibly ( 10, 0, 29 ) as an example.
-         * This is to ensure that Water/Sand Blocks are placed sparsely rather than locally.
-         */
-        ArrayList< Integer > xValues = new ArrayList<> ();
-
-        for ( int value = 0; value < _CHUNK_SIZE; value++ )
-        {
-            xValues.add ( value );
-        }
-
-        Collections.shuffle ( xValues );
-        ArrayList< Integer > zValues = new ArrayList<> ( xValues );
-
-        System.out.println ( "Sand Ratio : " + _SAND_RATIO );
-        System.out.println ( "Water Ratio : " + _WATER_RATIO );
-
-        for ( int x : xValues )
-        {
-            for ( int z : zValues )
-            {
-                for ( int y = 0; y < _CHUNK_SIZE; y++ )
-                {
-                    int height = ( int ) ( startY + ( int ) ( _CHUNK_SIZE * noise.getNoise ( x, y, z ) ) * _CUBE_LENGTH );
-
-                    System.out.println ( "X : " + x + " Y : " + y + " Z : " + z );
-
-                    // Randomly selects a Block Type
-                    // _blocks[x][y][z] = new Block ( Block.BlockType.values ()[_random.nextInt ( 6 )] );
-                    // Based on Y-Coordinate, will find the correct Block type
-                    // A Y-Coordinate <= 0 always signifies Bedrock
-                    // A Y-Coordinate above 0 and below the maximum height is Stone or Dirt
-                    // The topmost Y-Coordinate, the max, is Grass, Sand, or Water
-                    _blocks[x][y][z] = findAppropriateBlockTypeUsingCoordinate ( x, y, z, height < y );
-
-                    VertexPositionData.put ( createCube ( startX + x * _CUBE_LENGTH, y * _CUBE_LENGTH + ( int ) ( _CHUNK_SIZE * 0.8 ), startZ + z * _CUBE_LENGTH ) );
-                    VertexColorData.put ( createCubeVertexColor ( getCubeColor () ) );
-                    VertexTextureData.put ( Objects.requireNonNull ( createCubeTexture ( _blocks[x][y][z] ) ) );
-
-                    if ( height < y )
-                    {
-                        break;
-                    }
-                }
-            }
-        }
 
         /**
          * This approach places Sand/Water in predictable locations rather than
          * random locations
          */
-
-        /*
-        System.out.println ( "Sand Ratio : " + _SAND_RATIO );
-        System.out.println ( "Water Ratio : " + _WATER_RATIO );
-
-        for ( int x = 0; x < _CHUNK_SIZE; x++ )
+        for ( int y = 0, radius = y + 1; radius <= _CHUNK_SIZE / 2; y++, radius++ )
         {
-            for ( int z = 0; z < _CHUNK_SIZE; z++ )
+            for ( int x = 0; x < _CHUNK_SIZE; x++ )
             {
-                for ( int y = 0; y < _CHUNK_SIZE; y++ )
+                for ( int z = 0; z < _CHUNK_SIZE; z++ )
                 {
-                    int height = ( int ) ( startY + ( int ) ( _CHUNK_SIZE * noise.getNoise ( x, y, z ) ) * _CUBE_LENGTH );
+                    int currentX = Math.abs ( x - _CENTERX );
+                    int currentZ = Math.abs ( z - _CENTERZ );
 
-                    // Randomly selects a Block Type
-                    // _blocks[x][y][z] = new Block ( Block.BlockType.values ()[_random.nextInt ( 6 )] );
+                    final int currentRadius = Math.round ( ( float ) ( Math.sqrt ( currentX * currentX + currentZ * currentZ ) ) );
 
-                    // Based on Y-Coordinate, will find the correct Block type
-                    // A Y-Coordinate <= 0 always signifies Bedrock
-                    // A Y-Coordinate above 0 and below the maximum height is Stone or Dirt
-                    // The topmost Y-Coordinate, the max, is Grass, Sand, or Water
-                    _blocks[x][y][z] = findAppropriateBlockTypeUsingCoordinate ( x, y, z, height < y );
+                    System.out.println ( "X : " + x + " Y : " + y + " Z : " + z );
+                    System.out.println ( "Current Radius : " + currentRadius + " vs. Radius : " + radius );
 
-                    VertexPositionData.put ( createCube ( startX + x * _CUBE_LENGTH, y * _CUBE_LENGTH + ( int ) ( _CHUNK_SIZE * 0.8 ), startZ + z * _CUBE_LENGTH ) );
-                    VertexColorData.put ( createCubeVertexColor ( getCubeColor () ) );
-                    VertexTextureData.put ( Objects.requireNonNull ( createCubeTexture ( _blocks[x][y][z] ) ) );
-
-                    if ( height < y )
+                    if ( currentRadius <= radius )
                     {
-                        break;
+                        _blocks[x][y][z] = findAppropriateBlockTypeUsingCoordinate ( x, z, radius >= _CHUNK_SIZE / 2 );
+                        VertexPositionData.put ( createCube ( startX + x * _CUBE_LENGTH, ( y ) * _CUBE_LENGTH + ( int ) ( _CHUNK_SIZE * 0.8 ), startZ + z * _CUBE_LENGTH ) );
+                        VertexColorData.put ( createCubeVertexColor ( getCubeColor () ) );
+                        VertexTextureData.put ( Objects.requireNonNull ( createCubeTexture ( _blocks[x][y][z] ) ) );
+
+                        /*
+                        int maxHeight = Math.round ( ( float ) ( Math.random () * 2.0 ) );
+
+                        for ( int height = 0; height < maxHeight; height++ )
+                        {
+                            Block block = findAppropriateBlockTypeUsingCoordinate ( x, z,radius >= _CHUNK_SIZE / 2 );
+
+                            if ( block.getBlockTypeID () == Block.BlockType.Water.getBlockTypeID () && height > 0 )
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                _blocks[x][y + height][z] = findAppropriateBlockTypeUsingCoordinate ( x, z,radius >= _CHUNK_SIZE / 2 );
+                                VertexPositionData.put ( createCube ( startX + x * _CUBE_LENGTH, ( y + height ) * _CUBE_LENGTH + ( int ) ( _CHUNK_SIZE * 0.8 ), startZ + z * _CUBE_LENGTH ) );
+                                VertexColorData.put ( createCubeVertexColor ( getCubeColor () ) );
+                                VertexTextureData.put ( Objects.requireNonNull ( createCubeTexture ( _blocks[x][y + height][z] ) ) );
+                            }
+                        }
+                        */
                     }
                 }
             }
         }
-         */
+
         VertexColorData.flip ();
         VertexPositionData.flip ();
         VertexTextureData.flip ();
@@ -296,50 +352,109 @@ class Chunk
     // Sand or Grass. While at the topmost layer, based on the location of the block, if it is inside the radius
     // of our Lake/Pond, then return a Water Block Type, but if we are outside the radius, then generate a random
     // chance and either fill using Grass or Sand
-    private Block findAppropriateBlockTypeUsingCoordinate ( int x, int y, int z, boolean haveReachedHeightLimit )
+    private Block findAppropriateBlockTypeUsingCoordinate ( int x, int z, boolean haveReachedHeightLimit )
     {
-        // Bedrock
-        if ( y <= 0 )
+        if ( haveReachedHeightLimit )
         {
-            return new Block ( Block.BlockType.Bedrock );
-        }
-        else
-        {
-            // We are at the Topmost Layer
-            if ( haveReachedHeightLimit )
+            Continent continent = continentForCoordinate ( x, z );
+
+            if ( continent == null )
             {
-                x = Math.abs ( x - waterLocationX );
-                z = Math.abs ( z - waterLocationZ );
-
-                final int radius = Math.round ( ( float ) ( Math.sqrt ( x * x + z * z ) ) );
-
-                // If we are in the Area of the Lake/Pond, fill it with Water
-                if ( radius < waterRadius && _waterBlockCount < _WATER_RATIO )
+                return new Block ( Block.BlockType.Water );
+            }
+            else
+            {
+                switch ( continent )
                 {
-                    ++_waterBlockCount;
-                    return new Block ( Block.BlockType.Water );
-                } // Else, flip a coin and either fill with Grass or Sand if we are under the Sand Ratio
-                else
-                {
-                    int coinFlip = Math.round ( ( float ) Math.random () );
-
-                    if ( _sandBlockCount < _SAND_RATIO && coinFlip <= 0 )
-                    {
-                        ++_sandBlockCount;
-                        return new Block ( Block.BlockType.Sand );
-                    }
-                    else
+                    case NorthAmerica:
                     {
                         return new Block ( Block.BlockType.Grass );
                     }
+                    case SouthAmerica:
+                    {
+                        return new Block ( Block.BlockType.Grass );
+                    }
+                    case Europe:
+                    {
+                        return new Block ( Block.BlockType.Stone );
+                    }
+                    case Africa:
+                    {
+                        return new Block ( Block.BlockType.Sand );
+                    }
+                    case Asia:
+                    {
+                        return new Block ( Block.BlockType.Bedrock );
+                    }
+                    case Australia:
+                    {
+                        return new Block ( Block.BlockType.Dirt );
+                    }
+                    default:
+                    {
+                        return new Block ( Block.BlockType.Water );
+                    }
                 }
-            } // We are above Bedrock but below Topmost Layer
-            else
-            {
-                int coinFlip = Math.round ( ( float ) Math.random () );
-                return new Block ( coinFlip <= 0 ? Block.BlockType.Stone : Block.BlockType.Dirt );
             }
         }
+        else
+        {
+            int coinFlip = Math.round ( ( float ) Math.random () );
+            return new Block ( coinFlip <= 0 ? Block.BlockType.Stone : Block.BlockType.Dirt );
+        }
+    }
+
+    private Continent continentForCoordinate ( final int x, final int z )
+    {
+        if ( northAmerica.containsKey ( x ) )
+        {
+            if ( Collections.binarySearch ( northAmerica.get ( x ), z ) >= 0 )
+            {
+                return Continent.NorthAmerica;
+            }
+        }
+
+        if ( southAmerica.containsKey ( x ) )
+        {
+            if ( Collections.binarySearch ( southAmerica.get ( x ), z ) >= 0 )
+            {
+                return Continent.SouthAmerica;
+            }
+        }
+
+        if ( europe.containsKey ( x ) )
+        {
+            if ( Collections.binarySearch ( europe.get ( x ), z ) >= 0 )
+            {
+                return Continent.Europe;
+            }
+        }
+
+        if ( africa.containsKey ( x ) )
+        {
+            if ( Collections.binarySearch ( africa.get ( x ), z ) >= 0 )
+            {
+                return Continent.Africa;
+            }
+        }
+
+        if ( asia.containsKey ( x ) )
+        {
+            if ( Collections.binarySearch ( asia.get ( x ), z ) >= 0 )
+            {
+                return Continent.Asia;
+            }
+        }
+
+        if ( australia.containsKey ( x ) )
+        {
+            if ( Collections.binarySearch ( australia.get ( x ), z ) >= 0 )
+            {
+                return Continent.Australia;
+            }
+        }
+
+        return null;
     }
 
     //  Method : createCubeVertexColor

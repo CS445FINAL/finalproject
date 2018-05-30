@@ -25,6 +25,9 @@ class Camera
     private float _pitch;
     private Chunk _chunk;
 
+    private boolean shouldShowFlatEarth = false;
+    private FlatEarth _flatEarth;
+
     //  Method : Camera
     // Purpose : Camera constructor. Creates our _position Vectors and
     // initializes the _yaw and _pitch to zero
@@ -148,29 +151,33 @@ class Camera
             {
                 System.out.println ( "Goodbye!" );
             }
-            if ( Keyboard.isKeyDown ( Keyboard.KEY_UP ) || Keyboard.isKeyDown ( Keyboard.KEY_W ) )
+            else if ( Keyboard.isKeyDown ( Keyboard.KEY_UP ) || Keyboard.isKeyDown ( Keyboard.KEY_W ) )
             {
                 this.moveInDirectionWithDistance ( MovementDirection.NORTH, movementSpeed );
             }
-            if ( Keyboard.isKeyDown ( Keyboard.KEY_LEFT ) || Keyboard.isKeyDown ( Keyboard.KEY_A ) )
+            else if ( Keyboard.isKeyDown ( Keyboard.KEY_LEFT ) || Keyboard.isKeyDown ( Keyboard.KEY_A ) )
             {
                 this.moveInDirectionWithDistance ( MovementDirection.EAST, movementSpeed );
             }
-            if ( Keyboard.isKeyDown ( Keyboard.KEY_DOWN ) || Keyboard.isKeyDown ( Keyboard.KEY_S ) )
+            else if ( Keyboard.isKeyDown ( Keyboard.KEY_DOWN ) || Keyboard.isKeyDown ( Keyboard.KEY_S ) )
             {
                 this.moveInDirectionWithDistance ( MovementDirection.SOUTH, movementSpeed );
             }
-            if ( Keyboard.isKeyDown ( Keyboard.KEY_RIGHT ) || Keyboard.isKeyDown ( Keyboard.KEY_D ) )
+            else if ( Keyboard.isKeyDown ( Keyboard.KEY_RIGHT ) || Keyboard.isKeyDown ( Keyboard.KEY_D ) )
             {
                 this.moveInDirectionWithDistance ( MovementDirection.WEST, movementSpeed );
             }
-            if ( Keyboard.isKeyDown ( Keyboard.KEY_SPACE ) )
+            else if ( Keyboard.isKeyDown ( Keyboard.KEY_SPACE ) )
             {
                 this.moveInDirectionWithDistance ( MovementDirection.UP, movementSpeed );
             }
-            if ( Keyboard.isKeyDown ( Keyboard.KEY_LSHIFT ) || Keyboard.isKeyDown ( Keyboard.KEY_RSHIFT ) )
+            else if ( Keyboard.isKeyDown ( Keyboard.KEY_LSHIFT ) || Keyboard.isKeyDown ( Keyboard.KEY_RSHIFT ) )
             {
                 this.moveInDirectionWithDistance ( MovementDirection.DOWN, movementSpeed );
+            }
+            else if (  Keyboard.isKeyDown ( Keyboard.KEY_F1 ) )
+            {
+                shouldShowFlatEarth = !shouldShowFlatEarth;
             }
 
             glLoadIdentity ();
@@ -178,16 +185,32 @@ class Camera
 
             glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-            new Block ().renderSampleBlock ();
-
-            if ( _chunk == null )
+            if ( shouldShowFlatEarth )
             {
-                System.out.println ( "Now Loading World" );
+                glClearColor ( 0.5f, 0.4f, 0.9f, 0f );
 
-                _chunk = new Chunk ( 0, 8, -60 );
+                if ( _flatEarth == null )
+                {
+                    System.out.println ( "Now Loading Flat Earth" );
+                    _flatEarth = new FlatEarth ( 0, 8, -60 );
+                }
+
+                _flatEarth.render ();
             }
+            else
+            {
+                glClearColor ( 0.4f, 0.5f, 1.0f, 0f );
 
-            _chunk.render ();
+                new Block ().renderSampleBlock ();
+
+                if ( _chunk == null )
+                {
+                    System.out.println ( "Now Loading World" );
+                    _chunk = new Chunk ( 0, 8, -60 );
+                }
+
+                _chunk.render ();
+            }
 
             Display.update ();
             Display.sync ( 60 );
