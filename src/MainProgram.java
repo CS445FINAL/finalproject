@@ -58,7 +58,7 @@ class MainProgram
         Display.setFullscreen ( false );
         Display.setDisplayMode ( new DisplayMode ( _WIDTH, _HEIGHT ) );
         Display.setLocation ( -1, -1 );
-        Display.setTitle ( "Final Assignment by {Our Team Name}" );
+        Display.setTitle ( "Final Assignment by \"Things that really make you go Hmmm...\"" );
         Display.create ();
     }
 
