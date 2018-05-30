@@ -1,9 +1,9 @@
 /*
- * File : Chunk.java
+ * File : FlatEarth.java
  * Author : Michael Ly, Jose Garcia, Erik Huerta, Phong Trinh, Josh Montgomery
  * Class : CS 445 Computer Graphics
  * Assignment : Final Assignment Checkpoint #3
- * Purpose : A class that renders a random assortment of 3D Chunks
+ * Purpose : A class that renders a Flat Earth of 3D Chunks
  */
 
 import org.lwjgl.BufferUtils;
@@ -33,14 +33,16 @@ class FlatEarth
     private final int _vboColorHandle;
     private final int _vboTextureHandle;
 
+
     /* Flat Earth Variables */
+    private int _MAX_RADIUS = _CHUNK_SIZE / 2;
     private int _CENTERX = _CHUNK_SIZE / 2;
     private int _CENTERZ = _CHUNK_SIZE / 2;
 
     private static String commaRegEx = ",\\p{Space}*";
     private static String dashRegEx = "\\p{Space}*-\\p{Space}*";
 
-    // X , Z
+    // Key = X , Values = Z-Values
     private HashMap< Integer, ArrayList< Integer > > northAmerica = new HashMap<> ();
     private HashMap< Integer, ArrayList< Integer > > southAmerica = new HashMap<> ();
     private HashMap< Integer, ArrayList< Integer > > europe = new HashMap<> ();
@@ -75,6 +77,9 @@ class FlatEarth
         this.rebuildMesh ( originX, originY, originZ );
     }
 
+    //  Method : populateContinentResourcesFor
+    // Purpose : This method will read the X-Z Matrix Coordinates for each Continent and store them inside an ArrayList
+    // which will be used to search for and find a particular Chunk for a particular Continent during the rendering process
     private void populateContinentResourcesFor ( final Continent continent )
     {
         String continentString = continent.toString ();
@@ -276,18 +281,17 @@ class FlatEarth
     }
 
     //  Method : rebuildMesh
-    // Purpose : Generating the terrain using the Simplex Noise Classes. Also, draws the Chunks which create the world
+    // Purpose : Generating the world using a "Cone" formula. The "Cone" will be formed using Circles that increase in
+    // radius. At the topmost layer, depending on the coordinate, it will be used to search the "Continents" lists to see
+    // which "Continent" it belongs to. The texture changes depending on the "Continent". Blocks that belong to no
+    // "Continent" are rendered as "Water"
     private void rebuildMesh ( float startX, float startY, float startZ )
     {
         FloatBuffer VertexPositionData = BufferUtils.createFloatBuffer ( ( _CHUNK_SIZE * _CHUNK_SIZE * _CHUNK_SIZE ) * 6 * 12 );
         FloatBuffer VertexColorData = BufferUtils.createFloatBuffer ( ( _CHUNK_SIZE * _CHUNK_SIZE * _CHUNK_SIZE ) * 6 * 12 );
         FloatBuffer VertexTextureData = BufferUtils.createFloatBuffer ( ( _CHUNK_SIZE * _CHUNK_SIZE * _CHUNK_SIZE ) * 6 * 12 );
 
-        /**
-         * This approach places Sand/Water in predictable locations rather than
-         * random locations
-         */
-        for ( int y = 0, radius = y + 1; radius <= _CHUNK_SIZE / 2; y++, radius++ )
+        for ( int y = 0, radius = 0; radius <= _MAX_RADIUS; y++, radius++ )
         {
             for ( int x = 0; x < _CHUNK_SIZE; x++ )
             {
@@ -303,31 +307,10 @@ class FlatEarth
 
                     if ( currentRadius <= radius )
                     {
-                        _blocks[x][y][z] = findAppropriateBlockTypeUsingCoordinate ( x, z, radius >= _CHUNK_SIZE / 2 );
+                        _blocks[x][y][z] = findAppropriateBlockTypeUsingCoordinate ( x, z, radius >= _MAX_RADIUS );;
                         VertexPositionData.put ( createCube ( startX + x * _CUBE_LENGTH, ( y ) * _CUBE_LENGTH + ( int ) ( _CHUNK_SIZE * 0.8 ), startZ + z * _CUBE_LENGTH ) );
                         VertexColorData.put ( createCubeVertexColor ( getCubeColor () ) );
                         VertexTextureData.put ( Objects.requireNonNull ( createCubeTexture ( _blocks[x][y][z] ) ) );
-
-                        /*
-                        int maxHeight = Math.round ( ( float ) ( Math.random () * 2.0 ) );
-
-                        for ( int height = 0; height < maxHeight; height++ )
-                        {
-                            Block block = findAppropriateBlockTypeUsingCoordinate ( x, z,radius >= _CHUNK_SIZE / 2 );
-
-                            if ( block.getBlockTypeID () == Block.BlockType.Water.getBlockTypeID () && height > 0 )
-                            {
-                                break;
-                            }
-                            else
-                            {
-                                _blocks[x][y + height][z] = findAppropriateBlockTypeUsingCoordinate ( x, z,radius >= _CHUNK_SIZE / 2 );
-                                VertexPositionData.put ( createCube ( startX + x * _CUBE_LENGTH, ( y + height ) * _CUBE_LENGTH + ( int ) ( _CHUNK_SIZE * 0.8 ), startZ + z * _CUBE_LENGTH ) );
-                                VertexColorData.put ( createCubeVertexColor ( getCubeColor () ) );
-                                VertexTextureData.put ( Objects.requireNonNull ( createCubeTexture ( _blocks[x][y + height][z] ) ) );
-                            }
-                        }
-                        */
                     }
                 }
             }
@@ -352,48 +335,40 @@ class FlatEarth
     // Sand or Grass. While at the topmost layer, based on the location of the block, if it is inside the radius
     // of our Lake/Pond, then return a Water Block Type, but if we are outside the radius, then generate a random
     // chance and either fill using Grass or Sand
-    private Block findAppropriateBlockTypeUsingCoordinate ( int x, int z, boolean haveReachedHeightLimit )
+    private Block findAppropriateBlockTypeUsingCoordinate ( int x, int z, boolean haveReachedRadiusLimit )
     {
-        if ( haveReachedHeightLimit )
+        if ( haveReachedRadiusLimit )
         {
-            Continent continent = continentForCoordinate ( x, z );
-
-            if ( continent == null )
+            switch ( continentForCoordinate ( x, z ) )
             {
-                return new Block ( Block.BlockType.Water );
-            }
-            else
-            {
-                switch ( continent )
+                case NorthAmerica:
                 {
-                    case NorthAmerica:
-                    {
-                        return new Block ( Block.BlockType.Grass );
-                    }
-                    case SouthAmerica:
-                    {
-                        return new Block ( Block.BlockType.Grass );
-                    }
-                    case Europe:
-                    {
-                        return new Block ( Block.BlockType.Stone );
-                    }
-                    case Africa:
-                    {
-                        return new Block ( Block.BlockType.Sand );
-                    }
-                    case Asia:
-                    {
-                        return new Block ( Block.BlockType.Bedrock );
-                    }
-                    case Australia:
-                    {
-                        return new Block ( Block.BlockType.Dirt );
-                    }
-                    default:
-                    {
-                        return new Block ( Block.BlockType.Water );
-                    }
+                    return new Block ( Block.BlockType.Grass );
+                }
+                case SouthAmerica:
+                {
+                    return new Block ( Block.BlockType.Grass );
+                }
+                case Europe:
+                {
+                    return new Block ( Block.BlockType.Stone );
+                }
+                case Africa:
+                {
+                    return new Block ( Block.BlockType.Sand );
+                }
+                case Asia:
+                {
+                    return new Block ( Block.BlockType.Bedrock );
+                }
+                case Australia:
+                {
+                    return new Block ( Block.BlockType.Dirt );
+                }
+                case None:
+                default:
+                {
+                    return new Block ( Block.BlockType.Water );
                 }
             }
         }
@@ -404,6 +379,8 @@ class FlatEarth
         }
     }
 
+    //  Method : continentForCoordinate
+    // Purpose : Based on the Coordinate, will return the corresponding Block for the Continent if it exists
     private Continent continentForCoordinate ( final int x, final int z )
     {
         if ( northAmerica.containsKey ( x ) )
@@ -454,7 +431,7 @@ class FlatEarth
             }
         }
 
-        return null;
+        return Continent.None;
     }
 
     //  Method : createCubeVertexColor
